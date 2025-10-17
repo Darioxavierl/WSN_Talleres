@@ -1,0 +1,76 @@
+services:
+  ROS:
+    build: 
+     context: .
+     args:
+       UID: ${UID}
+       GID: ${GID}
+       USERNAME: ${USERNAME}
+    image: my-ros:1.0.3
+    container_name: serial-ros2
+    volumes:
+      - ./sensores:/home/${USERNAME}/ros2_ws/src/
+      - ./data:/home/${USERNAME}/ros2_ws/src/data
+    devices:
+      - /dev/${SERIAL_PORT}:/dev/${SERIAL_PORT}
+    privileged: true
+    networks:
+      rosnet:
+        ipv4_address: 30.10.10.5 
+    tty: true
+    stdin_open: true
+    command: bash
+    depends_on: 
+      - net-shoot
+
+  net-shoot:
+    image: nicolaka/netshoot
+    container_name: serial-netshoot
+    networks:
+      rosnet:
+        ipv4_address: 30.10.10.100
+    volumes:
+      - ./netshoot:/app/pcaps
+    command: ["tcpdump", "-i", "eth0", "-G", "300", "-W", "1", "-w", "/app/pcaps/trafico_ros2_%Y-%m-%d_%H-%M-%S.pcap"]
+    tty: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    networks:
+      rosnet:
+        ipv4_address: 30.10.10.50
+
+  infux:
+    image: influxdb:2.7
+    container_name: influx
+    ports:
+      - 8086:8086
+    volumes:
+      - ./influx/data:/var/lib/influxdb2
+      - ./influx/config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=sensores
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-token 
+    networks:
+      rosnet:
+        ipv4_address: 30.10.10.51
+
+
+networks:
+  rosnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 30.10.10.0/24
+          gateway: 30.10.10.1
+

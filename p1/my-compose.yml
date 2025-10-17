@@ -1,0 +1,27 @@
+services:
+  mi-ubuntu-mod1:
+    container_name: Ubuntu1
+    build: .
+    image: my-ubuntu:1.0.2
+    volumes:
+      - ./data:/home/datos
+    networks:
+      - U-network
+    restart: unless-stopped
+  mi-ubuntu-mod2:
+    container_name: Ubuntu2
+    build: .
+    image: my-ubuntu:1.0.2
+    volumes:
+      - ./data:/home/datos
+    networks:
+      - U-network
+    restart: unless-stopped
+
+networks:
+  U-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1
