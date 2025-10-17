@@ -1,8 +1,8 @@
-## REPOSITORIO CON LOS TALLERES DE REDES DE SENSORES
-# Dario Portilla - Telecomunicaciones
+# REPOSITORIO CON LOS TALLERES DE REDES DE SENSORES
+## Dario Portilla - Telecomunicaciones
 
-# Este repositorio contiene los talleres y prácticas realizadas para la materia de Redes de Sensores Inalámbricos (WSN).
-Cada carpeta contiene un taller independiente.
+**Este repositorio contiene los talleres y prácticas realizadas para la materia de Redes de Sensores Inalámbricos (WSN).
+Cada carpeta contiene un taller independiente.**
 
 ## Estructura del repositorio
 
