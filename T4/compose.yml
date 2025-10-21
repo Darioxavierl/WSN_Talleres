@@ -8,12 +8,15 @@ services:
     image: ubuntu-can
     environment:
       - DISPLAY=${DISPLAY}
+      - QT_QPA_PLATFORM=xcb
     volumes:
       - ./can:/home/${USERNAME}/can
-      -  /lib/modules:/lib/modules:ro
-      - /proc/modules:/proc/modules:ro
+      - /lib/modules:/lib/modules:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
     tty: true
     stdin_open: true
+    privileged: true
     cap_add:
       - NET_ADMIN
       - NET_RAW
