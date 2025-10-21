@@ -1,6 +1,6 @@
 [default]
   url = "http://localhost:8086"
-  token = "my-super-secret-token"
+  token = "mysecret"
   org = "my-org"
   active = true
 # 

@@ -1,0 +1,21 @@
+services:
+  U-CAN:
+    container_name: can
+    build:
+      context: .
+      args:
+       USERNAME: ${USERNAME}
+    image: ubuntu-can
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - ./can:/home/${USERNAME}/can
+      -  /lib/modules:/lib/modules:ro
+      - /proc/modules:/proc/modules:ro
+    tty: true
+    stdin_open: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: bash
+

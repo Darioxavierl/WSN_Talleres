@@ -1,13 +1,19 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from std_msgs.msg import Int32, Float32
 
 
 class ProccessorNode(Node):
     def __init__(self):
         super().__init__("proccessor_node")
-        self.subscription = self.create_subscription(Int32, "sensor_data", self.listener_callback,10)
-        self.publisher_ = self.create_publisher(Float32, "temperature_celcius", 10)
+        qos = QoSProfile(
+    reliability=ReliabilityPolicy.RELIABLE,
+    durability=DurabilityPolicy.TRANSIENT_LOCAL,
+    depth=10
+)
+        self.subscription = self.create_subscription(Int32, "sensor_data", self.listener_callback,qos)
+        self.publisher_ = self.create_publisher(Float32, "temperature_celcius", qos)
 
     def listener_callback(self, msg):
         raw_value = msg.data

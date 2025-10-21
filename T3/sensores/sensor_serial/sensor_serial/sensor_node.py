@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from std_msgs.msg import Int32
 import serial
 
@@ -7,7 +8,14 @@ class SensorNode(Node):
     def __init__(self):
         super().__init__("sensor_node")
         self.ser = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
-        self.publisher_ = self.create_publisher(Int32, "sensor_data", 10)
+        # Perfil QoS
+        qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            depth=10
+        )
+
+        self.publisher_ = self.create_publisher(Int32, "sensor_data",qos)
         self.timer = self.create_timer(1.0, self.publish_data)
 
     def publish_data(self):
