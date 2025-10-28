@@ -1,11 +1,12 @@
 services:
   U-CAN:
-    container_name: can
+    container_name: cant5
     build:
       context: .
+      dockerfile: Dockerfile.can
       args:
        USERNAME: ${USERNAME}
-    image: ubuntu-can
+    image: ubuntu-can:1.0.5
     environment:
       - DISPLAY=${DISPLAY}
       - QT_QPA_PLATFORM=xcb
@@ -25,4 +26,21 @@ services:
       - NET_RAW
     command: bash
         #command: [bash, "-c", "sudo ip link add dev vcan0 type vcan && sudo ip link set up vcan0 && tail -f /dev/null"]
-
+  ROS:
+    build: 
+     context: .
+     dockerfile: Dockerfile.ros
+     args:
+       USERNAME: ${USERNAME}
+    image: my-ros:1.0.5
+    container_name: can-ros
+    volumes:
+      - ./ros/sensores:/home/${USERNAME}/ros2_ws/src/
+      - ./ros/data:/home/${USERNAME}/ros2_ws/src/data
+    devices:
+      - /dev/${SERIAL_PORT}:/dev/${SERIAL_PORT}
+    privileged: true
+    network_mode: "host"
+    tty: true
+    stdin_open: true
+    command: bash

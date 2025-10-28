@@ -15,7 +15,8 @@ RUN apt update -y
 
 RUN apt install -y \
 libx11-6 libxcb1 libxkbcommon-x11-0 \ 
-libqt5gui5 libqt5widgets5 libqt5x11extras5 libqt5printsupport5 libqt5widgets5 libqt5gui5 libqt5core5a libqt5serialport5 libqt5serialbus5
+libqt5gui5 libqt5widgets5 libqt5x11extras5 libqt5printsupport5 libqt5widgets5 libqt5gui5 libqt5core5a libqt5serialport5 libqt5serialbus5 \
+libqt5serialbus5-dev libqt5serialport5-dev qtdeclarative5-dev qttools5-dev
 
 
 RUN echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
