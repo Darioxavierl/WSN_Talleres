@@ -1,0 +1,37 @@
+[0.871s] Invoking command in '/home/ubuntu/ros2_ws/src/can_decode': PYTHONPATH=/home/ubuntu/ros2_ws/src/build/can_decode/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/can_decode build --build-base /home/ubuntu/ros2_ws/src/build/can_decode/build install --record /home/ubuntu/ros2_ws/src/build/can_decode/install.log --single-version-externally-managed install_data
+[1.101s] running egg_info
+[1.102s] creating ../build/can_decode/can_decode.egg-info
+[1.122s] writing ../build/can_decode/can_decode.egg-info/PKG-INFO
+[1.122s] writing dependency_links to ../build/can_decode/can_decode.egg-info/dependency_links.txt
+[1.122s] writing entry points to ../build/can_decode/can_decode.egg-info/entry_points.txt
+[1.122s] writing requirements to ../build/can_decode/can_decode.egg-info/requires.txt
+[1.122s] writing top-level names to ../build/can_decode/can_decode.egg-info/top_level.txt
+[1.122s] writing manifest file '../build/can_decode/can_decode.egg-info/SOURCES.txt'
+[1.154s] reading manifest file '../build/can_decode/can_decode.egg-info/SOURCES.txt'
+[1.155s] writing manifest file '../build/can_decode/can_decode.egg-info/SOURCES.txt'
+[1.155s] running build
+[1.155s] running build_py
+[1.155s] creating /home/ubuntu/ros2_ws/src/build/can_decode/build
+[1.155s] creating /home/ubuntu/ros2_ws/src/build/can_decode/build/lib
+[1.155s] creating /home/ubuntu/ros2_ws/src/build/can_decode/build/lib/can_decode
+[1.155s] copying can_decode/reader_node.py -> /home/ubuntu/ros2_ws/src/build/can_decode/build/lib/can_decode
+[1.156s] copying can_decode/__init__.py -> /home/ubuntu/ros2_ws/src/build/can_decode/build/lib/can_decode
+[1.156s] running install
+[1.161s] running install_lib
+[1.177s] creating /home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages/can_decode
+[1.177s] copying /home/ubuntu/ros2_ws/src/build/can_decode/build/lib/can_decode/reader_node.py -> /home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages/can_decode
+[1.177s] copying /home/ubuntu/ros2_ws/src/build/can_decode/build/lib/can_decode/__init__.py -> /home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages/can_decode
+[1.177s] byte-compiling /home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages/can_decode/reader_node.py to reader_node.cpython-312.pyc
+[1.178s] byte-compiling /home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages/can_decode/__init__.py to __init__.cpython-312.pyc
+[1.178s] running install_data
+[1.178s] creating /home/ubuntu/ros2_ws/src/install/can_decode/share/ament_index
+[1.178s] creating /home/ubuntu/ros2_ws/src/install/can_decode/share/ament_index/resource_index
+[1.178s] creating /home/ubuntu/ros2_ws/src/install/can_decode/share/ament_index/resource_index/packages
+[1.178s] copying resource/can_decode -> /home/ubuntu/ros2_ws/src/install/can_decode/share/ament_index/resource_index/packages
+[1.179s] copying package.xml -> /home/ubuntu/ros2_ws/src/install/can_decode/share/can_decode
+[1.179s] running install_egg_info
+[1.195s] Copying ../build/can_decode/can_decode.egg-info to /home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages/can_decode-0.0.0-py3.12.egg-info
+[1.196s] running install_scripts
+[1.311s] Installing reader_node script to /home/ubuntu/ros2_ws/src/install/can_decode/lib/can_decode
+[1.312s] writing list of installed files to '/home/ubuntu/ros2_ws/src/build/can_decode/install.log'
+[1.335s] Invoked command in '/home/ubuntu/ros2_ws/src/can_decode' returned '0': PYTHONPATH=/home/ubuntu/ros2_ws/src/build/can_decode/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ubuntu/ros2_ws/src/install/can_decode/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/can_decode build --build-base /home/ubuntu/ros2_ws/src/build/can_decode/build install --record /home/ubuntu/ros2_ws/src/build/can_decode/install.log --single-version-externally-managed install_data

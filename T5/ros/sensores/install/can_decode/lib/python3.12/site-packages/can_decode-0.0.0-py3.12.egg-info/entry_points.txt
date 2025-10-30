@@ -1,0 +1,2 @@
+[console_scripts]
+reader_node = can_decode.reader_node:main

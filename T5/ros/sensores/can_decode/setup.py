@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'sensor_can'
+package_name = 'can_decode'
 
 setup(
     name=package_name,
@@ -24,9 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            "sensor_node = sensor_can.reader_node:main",
-            "monitor_node = sensor_can.monitor_node:main",
-            "reader_node = sensor_can.two_reader:main"
+            "reader_node = can_decode.reader_node:main"
         ],
     },
 )
