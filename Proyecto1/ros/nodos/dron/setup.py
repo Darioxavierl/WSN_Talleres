@@ -31,7 +31,8 @@ setup(
             "viewer_node=dron.video_viewer:main",
             "failsave_node=dron.battery_failsave:main",
             "video_detector_node=dron.video_detector:main",
-            "counter_node=dron.counter:main"
+            "counter_node=dron.counter:main",
+            "checker_node=dron.checker:main"
         ],
     },
 )
