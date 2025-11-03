@@ -28,8 +28,8 @@ Volumen compartidoy carpeta del proyecto:
     - failsave_node
     - video_detector_node
     - counter_node
-### Ejecucucion de nodos
-    1. Primero contruir con <<colcon build>>
+### Ejecucion de nodos
+    1. Primero construir con <<colcon build>>
     2. La imagen cuenta con el script "run-ros-program", al que se le pasa como argumentos, el nombre del proyecto y el nombre del nodo. asi se ejecuta, i.e: <<./run-ros-program dron comander_node>>
 
 
