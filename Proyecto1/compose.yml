@@ -1,6 +1,6 @@
 services:
   ROS:
-    image: my-ros:1.0.5
+    image: tjdariox/ros-tello:1.0
     container_name: ros-pj
     volumes:
       - ./ros/nodos:/home/${USERNAME}/ros2_ws/src/
