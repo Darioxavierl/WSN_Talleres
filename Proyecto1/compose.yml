@@ -1,0 +1,20 @@
+services:
+  ROS:
+    image: my-ros:1.0.5
+    container_name: ros-pj
+    volumes:
+      - ./ros/nodos:/home/${USERNAME}/ros2_ws/src/
+      - ./ros/data:/home/${USERNAME}/ros2_ws/src/data
+    devices:
+      - /dev/${SERIAL_PORT}:/dev/${SERIAL_PORT}
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_QPA_PLATFORM=xcb
+    privileged: true
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    tty: true
+    stdin_open: true
+    command: bash
