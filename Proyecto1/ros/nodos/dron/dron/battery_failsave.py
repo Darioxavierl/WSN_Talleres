@@ -20,6 +20,7 @@ class SafetyNode(Node):
         self.bateria = 100.0
         self.altura = 0.0
         self.landed = True  # Evita enviar múltiples comandos
+        self.umbral = 40
 
         # Suscripciones
         self.create_subscription(Float32, 'bateria', self.bateria_callback, 10)
@@ -42,7 +43,7 @@ class SafetyNode(Node):
     
     def publish_bateria_segura(self):
         flag = Bool()
-        flag.data = self.bateria > 30.0
+        flag.data = True if self.bateria > self.umbral else False
         self.pub_bat_segura.publish(flag)
         self.get_logger().debug(f"Batería segura: {flag.data}")
 
@@ -50,7 +51,7 @@ class SafetyNode(Node):
         self.altura = msg.data
 
     def check_safety(self):
-        if self.altura > 0 and self.bateria < 30.0 and self.landed:
+        if self.altura > 0 and self.bateria < self.umbral and self.landed:
             self.get_logger().warn(f"Batería baja ({self.bateria}%) y altura {self.altura}cm: ejecutando aterrizaje!")
             self.send_land_command()
             self.landed = False

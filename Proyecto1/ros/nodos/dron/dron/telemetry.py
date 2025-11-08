@@ -21,7 +21,7 @@ from dron.tello.tello_lib import Tello
 class TelemetryNode(Node):
     def __init__(self):
         super().__init__("conector_node")
-        self.tello = Tello(ssid="TELLO-636ECF")
+        self.tello = Tello(ssid="TELLO-636EBD")
         self.subscription = self.create_subscription(Float32, 'Conexion', self.listener_callback, 10)
         
         # Publicadores de telemetría (batería, altura, tiempo)

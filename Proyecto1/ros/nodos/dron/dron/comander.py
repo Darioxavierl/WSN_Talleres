@@ -18,7 +18,7 @@ class comanderNode(Node):
         super().__init__("comander_node")
         
         # Inicia la instancia de la libreria del dron 
-        self.tello = Tello(ssid="TELLO-636ECF", timeout=3)
+        self.tello = Tello(ssid="TELLO-636EBD", timeout=3)
 
         # Genera el timer que veridica la conexion cada 5 segundos
         self.create_timer(5.0, self.timer_callback)
@@ -146,7 +146,7 @@ class comanderNode(Node):
         self.get_logger().info(f"Esperando {seconds:.1f}s {motivo}...")
         time.sleep(seconds)
 
-    def execute_sequence3(self):
+    def execute_sequence(self):
         '''
         Metodo que permite realizar una secuencia de vuelo.
         Envia los comandos en orden, esperando unicamente el tiempo de delay entre
@@ -156,20 +156,20 @@ class comanderNode(Node):
             self.get_logger().info("Iniciando secuencia de vuelo...")
             self.get_logger().info("despegue")
             # Despegue
-            #self.tello.send_command("takeoff")
+            self.tello.send_command("takeoff")
             #self.delay(4.0)
 
-            self.tello.send_command("rc 0 0 10 0")  # x=20cm/s, y=0, z=0, yaw=0
-            self.delay(4.0)
+            #self.tello.send_command("rc 0 0 10 0")  # x=20cm/s, y=0, z=0, yaw=0
+            #self.delay(4.0)
 
             
 
             # Subir a 50 cm
-            for _ in range(2):
-                self.tello.send_command("rc 0 0 10 0")  # x=20cm/s, y=0, z=0, yaw=0
-                self.delay(1.0)
-                self.tello.send_command("rc 0 0 0 0")
-                self.delay(5)
+            #for _ in range(2):
+            #    self.tello.send_command("rc 0 0 10 0")  # x=20cm/s, y=0, z=0, yaw=0
+            #    self.delay(1.0)
+            #    self.tello.send_command("rc 0 0 0 0")
+            #    self.delay(5)
 
             self.get_logger().info("estabilizacion")
             # Espera estabilización
@@ -178,14 +178,14 @@ class comanderNode(Node):
             self.get_logger().info("avance")
             # Avanzar 50 cm
             # Mueve hacia adelante suavemente durante 1 segundo
-            self.tello.send_command("rc 0 10 0 0")  # x=20cm/s, y=0, z=0, yaw=0
-            self.delay(1.0)
-            self.tello.send_command("rc 0 0 0 0")
+            self.tello.send_command("forward 200")  # x=20cm/s, y=0, z=0, yaw=0
+            #self.delay(1.0)
+            #self.tello.send_command("rc 0 0 0 0")
             self.delay(self.tiempo_espera, "(pausa tras avance)")
             # Avanzar 50 cm
-            self.tello.send_command("rc 0 -10 0 0")
+            self.tello.send_command("back 200")
             self.delay(1.0)            # mueve durante 1 segundo
-            self.tello.send_command("rc 0 0 0 0")  # detener 
+            #self.tello.send_command("rc 0 0 0 0")  # detener 
             self.delay(self.tiempo_espera, "(pausa tras avance)")
 
             # Aterrizaje
@@ -201,7 +201,7 @@ class comanderNode(Node):
             self.tello.send_command("land")
             return False, f"Error: {str(e)}"
         
-    def execute_sequence(self):
+    def execute_sequence3(self):
         '''
         Metodo que permite realizar una secuencia de vuelo.
         Envia los comandos en orden, esperando unicamente el tiempo de delay entre

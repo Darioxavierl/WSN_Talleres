@@ -7,7 +7,7 @@ import numpy as np
 from queue import Queue, Full
 
 class Tello:
-    def __init__(self, ssid="TELLO-636ECF", ip="192.168.10.1", port=8889, state_port=8890, video_port=11111, timeout=10):
+    def __init__(self, ssid="TELLO-636EBD", ip="192.168.10.1", port=8889, state_port=8890, video_port=11111, timeout=10):
         self.address = (ip, port)
         self.state_port = state_port
         self.cmd_port = port

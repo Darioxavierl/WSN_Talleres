@@ -25,7 +25,7 @@ class VideoNode(Node):
         super().__init__("video_node_auto")
 
         # --- Inicialización del dron ---
-        self.tello = Tello(ssid="TELLO-636ECF", timeout=3)
+        self.tello = Tello(ssid="TELLO-636EBD", timeout=3)
         self.Conectado = False
 
         # --- Variables de control ---
