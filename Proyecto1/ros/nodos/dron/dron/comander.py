@@ -105,8 +105,6 @@ class comanderNode(Node):
         
         try:
             # Aquí va la lógica real: llamas a tu librería de Tello
-            # (Asumiendo que self.tello existe)
-            # self.tello.start_video()  <-- O la función que sea
             self.tello._stream_video(1) 
             
             # Si todo salió bien:

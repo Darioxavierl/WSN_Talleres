@@ -25,6 +25,7 @@ class MissionNode(Node):
         self.tello = Tello(ssid="TELLO-636EBD", timeout=3)
         self.Conectado = False
         self.battery_sec = False
+        self.prev_state = False
         self.altura = 0
         # --- Suscripción ROS ---
         self.subscription = self.create_subscription(Float32, 'Conexion', self.conexion_listener_callback, 10)
@@ -55,12 +56,26 @@ class MissionNode(Node):
 
     def conexion_listener_callback(self, msg):
         data = msg.data
+
+        # Determinar el nuevo estado según el valor recibido
         if data == 100:
             self.Conectado = True
-            self.get_logger().info("Dron conectado!")
         elif data == 200:
             self.Conectado = False
-            self.get_logger().info("Dron no conectado!")
+        else:
+            # Ignorar valores no reconocidos
+            return
+
+        # Solo imprimir si el estado cambió
+        if self.Conectado != self.prev_state:
+            if self.Conectado:
+                self.get_logger().info("Dron conectado.")
+            else:
+                self.get_logger().warn("Dron desconectado.")
+
+            # Actualizar el estado previo
+            self.prev_state = self.Conectado
+
 
     def listener_callback(self, msg):
         data = msg.data
@@ -98,8 +113,12 @@ class MissionNode(Node):
                     rclpy.shutdown()
                     break
 
-                if not self.Conectado and not self.battery_sec:
+                if not self.Conectado:
                     self.get_logger().warn("Dron no conectado. No se puede iniciar la misión.")
+                    continue
+
+                if not self.battery_sec:
+                    self.get_logger().warn("Bateria baja no se puede lanzar mision.")
                     continue
 
                 tiempo = input("Ingrese tiempo de pausa tras avance (segundos): ")

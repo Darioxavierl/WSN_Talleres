@@ -31,15 +31,30 @@ class TelemetryNode(Node):
         
         self.create_timer(1.0, self.timer_Telemtry)
         self.Conectado = False
+        self.prev_state = False
 
     def listener_callback(self, msg):
         data = msg.data
+
+        # Determinar el nuevo estado según el valor recibido
         if data == 100:
             self.Conectado = True
-            self.get_logger().info("Dron conectado!")
         elif data == 200:
             self.Conectado = False
-            self.get_logger().info("Dron no conectado!")
+        else:
+            # Ignorar valores no reconocidos
+            return
+
+        # Solo imprimir si el estado cambió
+        if self.Conectado != self.prev_state:
+            if self.Conectado:
+                self.get_logger().info("Dron conectado.")
+            else:
+                self.get_logger().warn("Dron desconectado.")
+
+            # Actualizar el estado previo
+            self.prev_state = self.Conectado
+
 
     def timer_Telemtry(self):
         if self.Conectado:

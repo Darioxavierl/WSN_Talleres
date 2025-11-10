@@ -34,6 +34,7 @@ class VideoNode(Node):
         self.publish = True
         self.frame_count = 0
         self.bridge = CvBridge()
+        self.prev_state = False
 
         # --- Comunicación ROS ---
         self.subscription = self.create_subscription(Float32, 'Conexion', self.listener_callback, 10)
@@ -52,15 +53,27 @@ class VideoNode(Node):
 
     # --- Callback de conexión ---
     def listener_callback(self, msg):
-        with self._lock:
-            prev_state = self.Conectado
-            self.Conectado = (msg.data == 100)
+        data = msg.data
 
-        if self.Conectado and not prev_state:
-            self.get_logger().info("→ Dron conectado!")
-        elif not self.Conectado and prev_state:
-            self.get_logger().warn("→ Dron desconectado!")
-            self.stop_video()
+        # Determinar el nuevo estado según el valor recibido
+        if data == 100:
+            self.Conectado = True
+        elif data == 200:
+            self.Conectado = False
+        else:
+            # Ignorar valores no reconocidos
+            return
+
+        # Solo imprimir si el estado cambió
+        if self.Conectado != self.prev_state:
+            if self.Conectado:
+                self.get_logger().info("Dron conectado.")
+            else:
+                self.get_logger().warn("Dron desconectado.")
+
+            # Actualizar el estado previo
+            self.prev_state = self.Conectado
+
 
     # --- Inicia stream ---
     def start_video(self):
