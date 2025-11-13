@@ -9,7 +9,7 @@ De este modo cualquier nodo que quiera mandar a volar al dron primero se asegura
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32, Bool
+from std_msgs.msg import Float32
 from std_srvs.srv import Trigger
 
 class SafetyNode(Node):
@@ -20,7 +20,7 @@ class SafetyNode(Node):
         self.bateria = 100.0
         self.altura = 0.0
         self.landed = True  # Evita enviar múltiples comandos
-        self.umbral = 40
+        self.umbral = 5
 
         # Suscripciones
         self.create_subscription(Float32, 'bateria', self.bateria_callback, 10)
@@ -32,18 +32,35 @@ class SafetyNode(Node):
             self.get_logger().info('Esperando servicio land_drone...')
 
         # Publicador de flag de batería segura
-        self.pub_bat_segura = self.create_publisher(Bool, 'bateria_segura', 10)
+        self.pub_bat_segura = self.create_publisher(Float32, 'bateria_segura', 10)
 
         # Timer para revisar condición cada 0.5s
         self.create_timer(0.5, self.check_safety)
 
+        # Hilo adicional para modificar el umbral desde consola
+        self.input_thread = threading.Thread(target=self.input_loop, daemon=True)
+        self.input_thread.start()
+
     def bateria_callback(self, msg):
+        #self.get_logger().info(f"Bateria {self.bateria}")
         self.bateria = msg.data
-        self.publish_bateria_segura()
+        #self.publish_bateria_segura()
+        flag = Float32()
+        #flag.data = True if self.bateria > self.umbral else False
+        if self.bateria > self.umbral:
+            flag.data = 1.0
+        else:
+            flag.data = 0.0
+        self.pub_bat_segura.publish(flag)
+        #self.get_logger().info(f"Batería segura: {flag.data}")
     
     def publish_bateria_segura(self):
-        flag = Bool()
-        flag.data = True if self.bateria > self.umbral else False
+        flag = Float32()
+        #flag.data = True if self.bateria > self.umbral else False
+        if self.bateria > self. umbral:
+            flag.data = 1
+        else:
+            flag.data = 0
         self.pub_bat_segura.publish(flag)
         self.get_logger().debug(f"Batería segura: {flag.data}")
 
@@ -67,6 +84,23 @@ class SafetyNode(Node):
             self.get_logger().info(f"{future.result().message}")
         else:
             self.get_logger().error(f"{future.result().message}")
+    
+    def input_loop(self):
+        """Hilo que permite cambiar el umbral en tiempo real desde consola."""
+        while True:
+            try:
+                new_value = input("Ingrese nuevo valor de umbral (actual={}): ".format(self.umbral))
+                if new_value.strip() == "":
+                    continue
+                new_val = float(new_value)
+                self.umbral = new_val
+                self.get_logger().info(f"Nuevo umbral establecido: {self.umbral}")
+            except ValueError:
+                print("Ingrese un número válido.")
+            except EOFError:
+                break  # Si el input se cierra, termina el hilo
+
+    
 
 
 def main(args=None):

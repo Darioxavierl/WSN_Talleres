@@ -50,7 +50,7 @@ class MissionNode(Node):
     def altura_listener_callback(self, msg):
         self.altura = msg.data
     def battery_sec_listener_callback(self, msg):
-        self.battery_sec = msg.data
+        self.battery_sec = True if msg.data > 0 else False
         
 
 
@@ -64,6 +64,7 @@ class MissionNode(Node):
             self.Conectado = False
         else:
             # Ignorar valores no reconocidos
+
             return
 
         # Solo imprimir si el estado cambió
@@ -71,6 +72,7 @@ class MissionNode(Node):
             if self.Conectado:
                 self.get_logger().info("Dron conectado.")
             else:
+
                 self.get_logger().warn("Dron desconectado.")
 
             # Actualizar el estado previo

@@ -20,112 +20,87 @@ class comanderNode(Node):
         # Inicia la instancia de la libreria del dron 
         self.tello = Tello(ssid="TELLO-636EBD", timeout=3)
 
-        # Genera el timer que veridica la conexion cada 5 segundos
+        # Genera el timer que verifica la conexion cada 5 segundos
         self.create_timer(5.0, self.timer_callback)
 
         # Crea el topico donde se publica el estado de la conexion
         self.publisher_ = self.create_publisher(Float32, "Conexion", 5)
 
         # Crea un servicio tipo Trigger que permite a cualquier nodo iniciar la transmision de video
-        self.create_service(
-            Trigger, 
-            "start_video", 
-            self.start_video_callback
-        )
+        self.create_service(Trigger, "start_video", self.start_video_callback)
         
-        # Crea un servicio tipo Trigger que permite a cualquier nodo terminar la transmision de video
-        self.create_service(
-            Trigger, 
-            "stop_video", 
-            self.stop_video_callback
-        )
+        # Crea un servicio tipo Trigger que permite detener la transmision de video
+        self.create_service(Trigger, "stop_video", self.stop_video_callback)
 
-        # Crea un servicio tipo Trigger que permite a cualquier nodo mandar un aterrizaje al dron
-        self.create_service(
-            Trigger, 
-            "aterriza", 
-            self.emergency_land_callback
-        )
+        # Crea un servicio tipo Trigger para aterrizaje forzoso
+        self.create_service(Trigger, "aterriza", self.emergency_land_callback)
         
-
-        # Crea un servicio tipo Trigger que permite a cualquier nodo iniciar una secuencia de vuelo
+        # Crea servicios para ejecutar secuencias
         self.srv = self.create_service(Trigger, 'tello_sequence', self.sequence_callback)
-        self.srv2= self.create_service(Trigger, 'tello_sequence2', self.sequence_callback2)
+        self.srv2 = self.create_service(Trigger, 'tello_sequence2', self.sequence_callback2)
 
-        # Se suscribe al topico que permite mandar el tiempo de espera dentro de la secuencia de vuelo
+        # Suscripción al tiempo de espera entre comandos
         self.timepo_sub = self.create_subscription(Float32, 'Tiempo', self.tiempo_listener_callback, 10)
         self.tiempo_espera = 0
         
-        # Inicio puerto para mandar comandos
+        # Bandera para aterrizaje prioritario
+        self.force_land = False
+
+        # Inicia el puerto de comandos
         self.tello._init_command_socket()
 
     def tiempo_listener_callback(self, msg):
-        '''
-        Obtiene el tiempo de espera para la secuencia de vuelo del topico suscrito.
-        '''
+        '''Obtiene el tiempo de espera para la secuencia de vuelo.'''
         self.tiempo_espera = msg.data
 
     def timer_callback(self):
-       '''
-       Este timer verifica la conexion con el dron enviando <<command>> al puerto del dron
-       y esperando la respuesta. Entonces publica en el potico <<Conexion>> el estado.
-       
-       '''
-       self.get_logger().info("[+] Probando conexión con el dron...")
-       msg = Float32()
-       if self.tello.check_connection(2):
-            #self.get_logger().info("Conectado!!")
+        '''
+        Verifica la conexion con el dron enviando <<command>> al puerto del dron
+        y esperando la respuesta. Publica en el topico <<Conexion>> el estado.
+        '''
+        self.get_logger().info("[+] Probando conexión con el dron...")
+        msg = Float32()
+        if self.tello.check_connection(2):
             msg.data = 100.0
-       else:
-            #self.get_logger().warn("No conectado.")
+        else:
             msg.data = 200.0
-       self.publisher_.publish(msg)  
+        self.publisher_.publish(msg)  
 
     def emergency_land_callback(self, request, response):
         """
-        Callback para enviar un aterrizaje forzoso al dron, a partir de la orden recibida por el topico.
+        Callback para enviar un aterrizaje forzoso al dron e interrumpir cualquier secuencia activa.
         """
-        self.get_logger().info("Aterrizaje forzoso...")
+        self.get_logger().warn("[!] Aterrizaje forzoso solicitado, interrumpiendo secuencia...")
+        self.force_land = True  # Señal para detener secuencia
+
         try:
-            self.tello.land()
-            # Si todo salió bien:
+            #self.tello.send_command("land")
             response.success = True
-            response.message = "Aterrizaje forzojo enviado"
+            response.message = "Aterrizaje forzoso ejecutado."
         except Exception as e:
             response.success = False
-            response.message = "Error enviando aterrizaje"
+            response.message = f"Error al aterrizar: {e}"
         return response
 
     def start_video_callback(self, request, response):
         """
-        Callback para el servicio 'start_video', inicia la emision de video del dron a partir de la orden recibida 
-        por el topico
+        Inicia la emisión de video del dron.
         """
         self.get_logger().info("Petición 'start_video' recibida...")
-        
         try:
-            # Aquí va la lógica real: llamas a tu librería de Tello
             self.tello._stream_video(1) 
-            
-            # Si todo salió bien:
             response.success = True
             response.message = "Video stream iniciado correctamente."
             self.get_logger().info("[+] 'start_video' ejecutado con éxito.")
-            
         except Exception as e:
-            # Si algo falló:
             response.success = False
             response.message = f"Error al iniciar video: {e}"
             self.get_logger().error(f"[!] 'start_video' falló: {e}")
-
-        # 3. DEVUELVES LA RESPUESTA
-        #    Esto es lo que recibirá el cliente.
         return response
 
     def stop_video_callback(self, request, response):
         """
-        Callback para el servicio 'stop_video', detiene la emision de video del dron a partir de la orden recibida 
-        por el topico
+        Detiene la emisión de video del dron.
         """
         self.get_logger().info("Petición 'stop_video' recibida...")
         try:
@@ -137,117 +112,137 @@ class comanderNode(Node):
             response.message = f"Error al detener video: {e}"
         return response
 
+    def check_abort(self):
+        """
+        Verifica si hay una orden de aterrizaje forzoso activa.
+        """
+        if self.force_land:
+            self.get_logger().warn("[!] Secuencia interrumpida por aterrizaje forzoso.")
+            self.tello.send_command("land")
+
+            raise InterruptedError("Secuencia abortada por aterrizaje forzoso.")
+
     def delay(self, seconds, motivo=""):
         """
-        Metodo para generar el delay dentro de una secuencia de vuelo.
+        Delay con verificación periódica de aterrizaje.
         """
         self.get_logger().info(f"Esperando {seconds:.1f}s {motivo}...")
-        time.sleep(seconds)
+        start = time.time()
+        while time.time() - start < seconds:
+            if self.force_land:
+                self.get_logger().warn("[!] Delay interrumpido por aterrizaje forzoso.")
+                raise InterruptedError("Delay abortado por aterrizaje forzoso.")
+            time.sleep(0.1)  # pausas cortas para permitir interrupciones rápidas
 
     def execute_sequence(self):
         '''
-        Metodo que permite realizar una secuencia de vuelo.
-        Envia los comandos en orden, esperando unicamente el tiempo de delay entre
-        cada comando.
+        Secuencia de vuelo básica con control de interrupción.
         '''
         try:
+            self.force_land = False  # Reinicia bandera
             self.get_logger().info("Iniciando secuencia de vuelo...")
-            self.get_logger().info("despegue")
-            # Despegue
+
+            self.check_abort()
+            self.get_logger().info("Despegue")
             self.tello.send_command("takeoff")
-            #self.delay(4.0)
 
-            #self.tello.send_command("rc 0 0 10 0")  # x=20cm/s, y=0, z=0, yaw=0
-            #self.delay(4.0)
-
-            
-
-            # Subir a 50 cm
-            #for _ in range(2):
-            #    self.tello.send_command("rc 0 0 10 0")  # x=20cm/s, y=0, z=0, yaw=0
-            #    self.delay(1.0)
-            #    self.tello.send_command("rc 0 0 0 0")
-            #    self.delay(5)
-
-            self.get_logger().info("estabilizacion")
-            # Espera estabilización
+            self.check_abort()
             stab_time = random.uniform(3.0, 5.0)
             self.delay(stab_time, "(estabilización tras despegue)")
-            self.get_logger().info("avance")
-            # Avanzar 50 cm
-            # Mueve hacia adelante suavemente durante 1 segundo
-            self.tello.send_command("forward 200")  # x=20cm/s, y=0, z=0, yaw=0
-            #self.delay(1.0)
-            #self.tello.send_command("rc 0 0 0 0")
-            self.delay(self.tiempo_espera, "(pausa tras avance)")
-            # Avanzar 50 cm
-            self.tello.send_command("back 200")
-            self.delay(1.0)            # mueve durante 1 segundo
-            #self.tello.send_command("rc 0 0 0 0")  # detener 
+
+            self.check_abort()
+            self.get_logger().info("Avance")
+            self.tello.send_command("forward 200")
             self.delay(self.tiempo_espera, "(pausa tras avance)")
 
-            # Aterrizaje
+            self.check_abort()
+            self.get_logger().info("Retroceso")
+            self.tello.send_command("back 200")
+            self.delay(self.tiempo_espera, "(pausa tras retroceso)")
+
+            self.check_abort()
+            self.get_logger().info("Giro en clockwise")
+            self.tello.send_command("cw 360")
+            self.delay(self.tiempo_espera, "(esperando giro completo)")
+
+
+
+            self.check_abort()
+            self.get_logger().info("Aterrizando...")
             self.tello.send_command("land")
             self.delay(2.0, "(esperando aterrizaje)")
 
             self.get_logger().info("Secuencia completada con éxito.")
-
             return True, "Secuencia ejecutada correctamente."
 
+        except InterruptedError:
+            # Secuencia interrumpida por aterrizaje forzoso
+            return False, "Secuencia interrumpida por aterrizaje forzoso."
         except Exception as e:
             self.get_logger().error(f"Error durante la secuencia: {e}")
-            self.tello.send_command("land")
+            try:
+                self.tello.send_command("land")
+            except:
+                pass
             return False, f"Error: {str(e)}"
         
-    def execute_sequence3(self):
+    def execute_sequence2(self):
         '''
-        Metodo que permite realizar una secuencia de vuelo.
-        Envia los comandos en orden, esperando unicamente el tiempo de delay entre
-        cada comando.
+        Segunda secuencia de vuelo con giro y control de interrupción.
         '''
         try:
-            self.get_logger().info("Iniciando secuencia de vuelo...")
+            self.force_land = False
+            self.get_logger().info("Iniciando secuencia de vuelo 2...")
 
+            self.check_abort()
             self.tello.send_command("takeoff")
             self.delay(3.0)
 
-            # Avanzar 50 cm
-            self.tello.send_command("go 0 -3 0 10")
+            self.check_abort()
+            self.get_logger().info("Movimiento lateral")
+            self.tello.send_command("go 0 -30 0 10")
             self.delay(self.tiempo_espera, "(pausa tras avance)")
 
-            # Aterrizaje
+            self.check_abort()
+            self.get_logger().info("Giro de 360°")
+            self.tello.send_command("cw 360")
+            self.delay(4.0, "(esperando giro completo)")
+
+            self.check_abort()
+            self.get_logger().info("Aterrizando...")
             self.tello.send_command("land")
-            self.delay(2.0, "(esperando aterrizaje)")
+            self.delay(self.tiempo_espera, "(esperando aterrizaje)")
 
-            self.get_logger().info("Secuencia completada con éxito.")
-            return True, "Secuencia ejecutada correctamente."
+            self.get_logger().info("Secuencia 2 completada con éxito.")
+            return True, "Secuencia 2 ejecutada correctamente."
 
+        except InterruptedError:
+            return False, "Secuencia 2 interrumpida por aterrizaje forzoso."
         except Exception as e:
-            self.get_logger().error(f"Error durante la secuencia: {e}")
-            self.tello.send_command("land")
+            self.get_logger().error(f"Error durante la secuencia 2: {e}")
+            try:
+                self.tello.send_command("land")
+            except:
+                pass
             return False, f"Error: {str(e)}"
         
     def sequence_callback(self, request, response):
         '''
-        Callback que permite lanzar la secuencia de vuelo a partir de la activacion mediante el servicio tipo triger.
-        Espera que se terminen de enviar los comando y responde al servicio.
+        Callback para lanzar la primera secuencia de vuelo.
         '''
         success, message = self.execute_sequence()
         response.success = success
         response.message = message
         return response
+
     def sequence_callback2(self, request, response):
         '''
-        Callback que permite lanzar la secuencia de vuelo a partir de la activacion mediante el servicio tipo triger.
-        Espera que se terminen de enviar los comando y responde al servicio.
+        Callback para lanzar la segunda secuencia de vuelo.
         '''
         success, message = self.execute_sequence2()
         response.success = success
         response.message = message
         return response
-
-
-
 
 
 def main(args=None):
