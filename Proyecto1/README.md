@@ -14,6 +14,58 @@
 ## Requerimientos
 La arquitectura del contenedor está diseñada para soportar interfaces gráficas vía X11, acceso a dispositivos físicos, y comunicación directa con el dron mediante networking en modo host, por lo que el sistema donde se ejecute debe cumplir los siguientes requisitos.
 
+# 1. Sistema Operativo
+
+Se recomienda uno de los siguientes:
+
+- Linux (Ubuntu 20.04/22.04 altamente recomendado). Es el entorno nativo para X11, ROS2 y privilegios de bajo nivel.
+
+- ⚠️ No se garantiza compatibilidad completa con Windows o macOS debido al uso de network_mode: host, acceso a /dev, y forwarding directo de X11.
+
+# 2. Docker y Docker Compose
+
+Instalar:
+
+- Docker Engine ≥ 24.x
+
+- Docker Compose ≥ 2.x
+
+# 3. Servidor gráfico X11
+
+El contenedor usa aplicaciones gráficas basadas en Qt6, por lo que el host debe contar con:
+
+- Servidor X11 funcionando
+
+Permisos para compartir el socket con Docker:
+```bash
+xhost +local:docker
+```
+El archivo /tmp/.X11-unix se monta dentro del contenedor, por lo que debe existir en el host.
+
+# 4. Variables de entorno necesarias
+
+El host debe exponer:
+
+- DISPLAY
+
+- USERNAME (ubuntu por defecto)
+
+- SERIAL_PORT
+- 
+```bash
+export DISPLAY=:0
+export USERNAME=$USER
+export SERIAL_PORT=ttyUSB0
+```
+# 5. Volúmenes necesarios
+
+El contenedor espera que existan en el host las rutas:
+```bash
+./ros/nodos/
+./ros/data/
+```
+---
+
 ## Estructura del proyecto:
 
 **Nombre del proyecto de ROS:** `Dron`
