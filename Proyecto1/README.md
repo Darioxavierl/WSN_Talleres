@@ -10,6 +10,10 @@
 
 ---
 
+
+## Requerimientos
+La arquitectura del contenedor está diseñada para soportar interfaces gráficas vía X11, acceso a dispositivos físicos, y comunicación directa con el dron mediante networking en modo host, por lo que el sistema donde se ejecute debe cumplir los siguientes requisitos.
+
 ## Estructura del proyecto:
 
 **Nombre del proyecto de ROS:** `Dron`
