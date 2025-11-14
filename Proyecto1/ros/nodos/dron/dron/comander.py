@@ -18,7 +18,7 @@ class comanderNode(Node):
         super().__init__("comander_node")
         
         # Inicia la instancia de la libreria del dron 
-        self.tello = Tello(ssid="TELLO-636EBD", timeout=3)
+        self.tello = Tello(ssid="TELLO-636ECF", timeout=3)
 
         # Genera el timer que verifica la conexion cada 5 segundos
         self.create_timer(5.0, self.timer_callback)

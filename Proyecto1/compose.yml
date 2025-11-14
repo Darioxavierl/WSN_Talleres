@@ -5,10 +5,12 @@ services:
     volumes:
       - ./ros/nodos:/home/${USERNAME}/ros2_ws/src/
       - ./ros/data:/home/${USERNAME}/ros2_ws/src/data
+      - /tmp/.X11-unix:/tmp/.X11-unix
     devices:
       - /dev/${SERIAL_PORT}:/dev/${SERIAL_PORT}
     environment:
       - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
       - QT_QPA_PLATFORM=xcb
     privileged: true
     network_mode: "host"

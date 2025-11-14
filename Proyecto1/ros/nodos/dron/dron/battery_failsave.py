@@ -11,6 +11,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32
 from std_srvs.srv import Trigger
+import threading
 
 class SafetyNode(Node):
     def __init__(self):

@@ -22,7 +22,7 @@ class MissionNode(Node):
     def __init__(self):
         super().__init__("mision_node")
         # --- Inicialización del dron ---
-        self.tello = Tello(ssid="TELLO-636EBD", timeout=3)
+        self.tello = Tello(ssid="TELLO-636ECF", timeout=3)
         self.Conectado = False
         self.battery_sec = False
         self.prev_state = False
